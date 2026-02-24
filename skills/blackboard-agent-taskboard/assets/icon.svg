@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-48 -48 608 608" width="512" height="512">
+  <defs>
+    <!-- Realistic Chalk Filter -->
+    <filter id="chalk" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" result="noise" />
+      <feColorMatrix type="matrix" in="noise" result="alphaNoise" values="
+        1 0 0 0 0
+        0 1 0 0 0
+        0 0 1 0 0
+        2 0 0 0 -0.5" />
+      <feComposite in="SourceGraphic" in2="alphaNoise" operator="in" result="dusty" />
+      <feDisplacementMap in="dusty" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </defs>
+
+  <!-- Clean dark chalkboard background -->
+  <rect width="512" height="512" rx="48" fill="#23342D" />
+
+  <!-- Faint blackboard smudge in background to look like an erased board -->
+  <path d="M100,100 Q400,150 350,400 Q150,450 100,200 Z" fill="#ffffff" opacity="0.04" filter="blur(30px)" />
+  <path d="M256,150 Q450,200 400,450 Q200,500 150,250 Z" fill="#ffffff" opacity="0.03" filter="blur(40px)" />
+
+  <g filter="url(#chalk)">
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="14">
+      <circle cx="372" cy="360" r="48" stroke="#ffffff" />
+    </g>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6" opacity="0.9">
+      <circle cx="372" cy="360" r="48" stroke="#ffffff" />
+    </g>
+
+    <!-- Base Thick Stroke to simulate chalk rubbing -->
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="14">
+      <!-- Edges (Light Cyan to differentiate from white nodes) -->
+      <g stroke="#8ECAE6" opacity="0.8">
+        <!-- Root to Right: extending the line deeper into the node -->
+        <path d="M 278 182 L 353 325" />
+        <path d="M 328 309 L 353 325 L 354 295" />
+
+        <!-- Left to Right: extending the line deeper into the node (e.g. x ~ 332) -->
+        <path d="M 188 360 L 332 360" />
+        <path d="M 310 347 L 332 360 L 310 373" />
+      </g>
+    </g>
+
+    <!-- Core Thin Stroke for Density in the center of the chalk stroke -->
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6" opacity="0.9">
+      <!-- Edges -->
+      <g stroke="#8ECAE6">
+        <!-- Root to Right -->
+        <path d="M 278 182 L 353 325" />
+        <path d="M 328 309 L 353 325 L 354 295" />
+
+        <!-- Left to Right -->
+        <path d="M 188 360 L 332 360" />
+        <path d="M 310 347 L 332 360 L 310 373" />
+      </g>
+    </g>
+
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="14">
+      <circle cx="140" cy="360" r="48" stroke="#ffffff" />
+    </g>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6" opacity="0.9">
+      <circle cx="140" cy="360" r="48" stroke="#ffffff" />
+    </g>
+
+
+    <!-- Base Thick Stroke to simulate chalk rubbing -->
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="14">
+      <!-- Edges (Light Cyan to differentiate from white nodes) -->
+      <g stroke="#8ECAE6" opacity="0.8">
+        <!-- Root to Left: extending the line deeper into the node (e.g. y ~ 325) -->
+        <path d="M 234 182 L 159 325" />
+        <path d="M 158 295 L 159 325 L 184 309" />
+      </g>
+    </g>
+
+    <!-- Core Thin Stroke for Density in the center of the chalk stroke -->
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6" opacity="0.9">
+      <!-- Edges -->
+      <g stroke="#8ECAE6">
+        <!-- Root to Left -->
+        <path d="M 234 182 L 159 325" />
+        <path d="M 158 295 L 159 325 L 184 309" />
+      </g>
+    </g>
+
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="14">
+      <circle cx="256" cy="140" r="48" stroke="#FFD166" />
+    </g>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6" opacity="0.9">
+      <circle cx="256" cy="140" r="48" stroke="#FFD166" />
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Blackboard Agent Taskboard"
+  short_description: "Plan and operate Blackboard taskboards for large multi-step work with explicit checkpoints, dependencies, role ownership, staged review gates, durable status tracking, and controlled re-planning."
+  default_prompt: "Use $blackboard-agent-taskboard to plan and execute large tasks on Blackboard when the work requires 30 minutes or more of focused effort, explicit checkpoints and dependencies, role-based responsibilities, staged implementation and review gates (for example security, quality, and validation), durable status tracking, and controlled re-planning in single-agent or multi-role workflows."
+  icon_large: "./assets/icon.png"
+  icon_small: "./assets/icon.svg"

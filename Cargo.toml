@@ -1,0 +1,21 @@
+[package]
+name = "blackboard"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4.5.60", features = ["derive"] }
+rusqlite = { version = "0.38.0", features = ["bundled"] }
+dirs = "6.0.0"
+serde_json = "1.0.149"
+libc = "0.2.182"
+
+[dev-dependencies]
+assert_cmd = "2.1.2"
+criterion = { version = "0.8.2", features = ["html_reports"] }
+predicates = "3.1.4"
+tempfile = "3.26.0"
+
+[[bench]]
+name = "cli_bench"
+harness = false
