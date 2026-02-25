@@ -36,6 +36,8 @@ fn concurrent_task_add_calls_succeed_without_lock_errors() {
                     &title,
                     "--description",
                     "load",
+                    "--size",
+                    "small",
                 ])
                 .output()
                 .expect("failed to run task add");

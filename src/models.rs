@@ -3,6 +3,7 @@ pub struct Task {
     pub id: i64,
     pub title: String,
     pub description: String,
+    pub size: String,
     pub parent_id: Option<i64>,
     pub assignee_id: Option<i64>,
     pub assignee_name: Option<String>,

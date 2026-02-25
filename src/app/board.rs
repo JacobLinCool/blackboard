@@ -290,12 +290,12 @@ impl App {
         let mut fingerprint = format!("owner:{};", owner_id);
 
         let mut task_stmt = conn.prepare(
-            "SELECT id,updated_at,status,parent_id,assignee_id,title,description FROM tasks WHERE board_id=?1 ORDER BY id",
+            "SELECT id,updated_at,status,parent_id,assignee_id,title,description,size FROM tasks WHERE board_id=?1 ORDER BY id",
         )?;
         let mut task_rows = task_stmt.query([board_id])?;
         while let Some(row) = task_rows.next()? {
             fingerprint.push_str(&format!(
-                "t:{}:{}:{}:{:?}:{:?}:{}:{};",
+                "t:{}:{}:{}:{:?}:{:?}:{}:{}:{};",
                 row.get::<_, i64>(0)?,
                 row.get::<_, i64>(1)?,
                 row.get::<_, String>(2)?,
@@ -303,6 +303,7 @@ impl App {
                 row.get::<_, Option<i64>>(4)?,
                 row.get::<_, String>(5)?,
                 row.get::<_, String>(6)?,
+                row.get::<_, String>(7)?,
             ));
         }
 

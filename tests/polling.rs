@@ -82,6 +82,8 @@ fn board_poll_detects_updates() {
         "t1",
         "--description",
         "d1",
+        "--size",
+        "small",
     ]);
 
     thread::sleep(Duration::from_millis(1800));

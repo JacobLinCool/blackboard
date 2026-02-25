@@ -40,8 +40,18 @@ fn schema_matches_single_current_model() {
     }
 
     assert!(columns.contains(&"status".to_string()));
+    assert!(columns.contains(&"size".to_string()));
     assert!(columns.contains(&"assignee_id".to_string()));
     assert!(!columns.contains(&"kind".to_string()));
+
+    let task_notes_count: i64 = conn
+        .query_row(
+            "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='task_notes'",
+            [],
+            |row| row.get(0),
+        )
+        .expect("failed to inspect sqlite_master for task_notes");
+    assert_eq!(task_notes_count, 1);
 
     let mut members_statement = conn
         .prepare("PRAGMA table_info(board_members)")

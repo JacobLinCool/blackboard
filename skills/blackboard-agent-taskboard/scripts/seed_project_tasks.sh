@@ -25,9 +25,9 @@ bb() {
   "$BLACKBOARD_BIN" "$@"
 }
 
-bb task add --user "$PLANNER" --board "$BOARD" --title "${PREFIX}: Analyze Scope" --description "Clarify requirements, assumptions, and constraints."
-bb task add --user "$PLANNER" --board "$BOARD" --title "${PREFIX}: Build Implementation Plan" --description "Break down tasks and dependencies for execution."
-bb task add --user "$PLANNER" --board "$BOARD" --title "${PREFIX}: Execute and Validate" --description "Complete implementation and verify acceptance criteria."
+bb task add --user "$PLANNER" --board "$BOARD" --title "${PREFIX}: Analyze Scope" --description "Clarify requirements, assumptions, and constraints." --size small
+bb task add --user "$PLANNER" --board "$BOARD" --title "${PREFIX}: Build Implementation Plan" --description "Break down tasks and dependencies for execution." --size medium
+bb task add --user "$PLANNER" --board "$BOARD" --title "${PREFIX}: Execute and Validate" --description "Complete implementation and verify acceptance criteria." --size medium
 
 echo "seeded tasks for ${BOARD}:"
 bb task list --user "$PLANNER" --board "$BOARD"

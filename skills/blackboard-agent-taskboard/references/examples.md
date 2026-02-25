@@ -6,7 +6,7 @@
 2. Custom specialized multi-role bootstrap
 3. Role-restricted execution flow
 4. Scope-change re-plan flow
-5. Single-agent large-task flow
+5. Single-agent delivery flow
 
 ## 1) Baseline Multi-Role Bootstrap
 
@@ -49,23 +49,23 @@ Expected result:
 Planner creates and updates plan:
 
 ```bash
-blackboard task add --user planner --board project-beta --title "Phase 1: Implement" --description "Implement feature."
-blackboard task add --user planner --board project-beta --title "Gate 1: Security Review" --description "Review and fix findings." --depends-on "1"
-blackboard task add --user planner --board project-beta --title "Gate 2: Quality Review" --description "Run quality checks." --depends-on "2"
+blackboard task add --user planner --board project-beta --title "Phase 1: Implement" --description "Implement feature." --size medium
+blackboard task add --user planner --board project-beta --title "Gate 1: Security Review" --description "Review and fix findings." --size small --depends-on "1"
+blackboard task add --user planner --board project-beta --title "Gate 2: Quality Review" --description "Run quality checks." --size small --depends-on "2"
 ```
 
 Executor/reviewer updates status only:
 
 ```bash
-blackboard task status --user implementer --board project-beta --task-id 1 --status completed
+blackboard task status --user implementer --board project-beta --task-id 1 --status completed --note "implementation done"
 blackboard task status --user security --board project-beta --task-id 2 --status in_progress
-blackboard task status --user security --board project-beta --task-id 2 --status blocked
+blackboard task status --user security --board project-beta --task-id 2 --status blocked --note "critical finding pending"
 ```
 
 Executor cannot mutate plan:
 
 ```bash
-blackboard task add --user implementer --board project-beta --title "should fail" --description "x"
+blackboard task add --user implementer --board project-beta --title "should fail" --description "x" --size small
 # -> forbidden: create denied
 ```
 
@@ -78,19 +78,19 @@ When requirements change:
 3. resume execution on revised checkpoints
 
 ```bash
-blackboard task add --user planner --board project-beta --title "Gate X: Change Impact Analysis" --description "Assess new requirement impact."
+blackboard task add --user planner --board project-beta --title "Gate X: Change Impact Analysis" --description "Assess new requirement impact." --size small
 blackboard task edit --user planner --board project-beta --task-id 3 --description "Revised after scope update."
 ```
 
-## 5) Single-Agent Large-Task Flow
+## 5) Single-Agent Delivery Flow
 
 ```bash
 blackboard init --user owner
 blackboard board create --user owner --name release-2026-q1
-blackboard task add --user owner --board release-2026-q1 --title "Phase 1: Implement" --description "Complete implementation."
-blackboard task add --user owner --board release-2026-q1 --title "Gate 1: Security Check" --description "Security review and fixes." --depends-on "1"
-blackboard task add --user owner --board release-2026-q1 --title "Gate 2: Code Quality Check" --description "Quality checks and cleanup." --depends-on "2"
-blackboard task add --user owner --board release-2026-q1 --title "Gate 3: Acceptance Validation" --description "Validate acceptance criteria." --depends-on "3"
+blackboard task add --user owner --board release-2026-q1 --title "Phase 1: Implement" --description "Complete implementation." --size medium
+blackboard task add --user owner --board release-2026-q1 --title "Gate 1: Security Check" --description "Security review and fixes." --size small --depends-on "1"
+blackboard task add --user owner --board release-2026-q1 --title "Gate 2: Code Quality Check" --description "Quality checks and cleanup." --size small --depends-on "2"
+blackboard task add --user owner --board release-2026-q1 --title "Gate 3: Acceptance Validation" --description "Validate acceptance criteria." --size small --depends-on "3"
 ```
 
 Execution loop:
@@ -98,6 +98,6 @@ Execution loop:
 ```bash
 blackboard task list --user owner --board release-2026-q1
 blackboard task status --user owner --board release-2026-q1 --task-id 1 --status in_progress
-blackboard task status --user owner --board release-2026-q1 --task-id 1 --status completed
+blackboard task status --user owner --board release-2026-q1 --task-id 1 --status completed --note "implementation complete"
 blackboard task status --user owner --board release-2026-q1 --task-id 2 --status in_progress
 ```

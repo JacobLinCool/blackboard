@@ -95,6 +95,8 @@ pub enum TaskCmd {
         #[arg(long)]
         status: Option<StatusArg>,
         #[arg(long)]
+        size: Option<SizeArg>,
+        #[arg(long)]
         parent: Option<i64>,
         #[arg(long)]
         assignee: Option<String>,
@@ -117,6 +119,8 @@ pub enum TaskCmd {
         #[arg(long)]
         description: String,
         #[arg(long)]
+        size: SizeArg,
+        #[arg(long)]
         parent: Option<i64>,
         #[arg(long)]
         assignee: Option<String>,
@@ -135,6 +139,8 @@ pub enum TaskCmd {
         #[arg(long)]
         description: Option<String>,
         #[arg(long)]
+        size: Option<SizeArg>,
+        #[arg(long)]
         parent: Option<i64>,
         #[arg(long)]
         assignee: Option<String>,
@@ -152,6 +158,8 @@ pub enum TaskCmd {
         task_id: i64,
         #[arg(long)]
         status: StatusArg,
+        #[arg(long)]
+        note: Option<String>,
     },
     Delete {
         #[arg(long)]
@@ -199,6 +207,25 @@ impl StatusArg {
             StatusArg::InProgress => "in_progress",
             StatusArg::Completed => "completed",
             StatusArg::Blocked => "blocked",
+        }
+    }
+}
+
+#[derive(ValueEnum, Clone)]
+pub enum SizeArg {
+    Micro,
+    Small,
+    Medium,
+    Large,
+}
+
+impl SizeArg {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            SizeArg::Micro => "micro",
+            SizeArg::Small => "small",
+            SizeArg::Medium => "medium",
+            SizeArg::Large => "large",
         }
     }
 }

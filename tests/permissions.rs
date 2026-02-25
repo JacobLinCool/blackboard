@@ -35,6 +35,8 @@ fn permissions_gate_each_action() {
         "t1",
         "--description",
         "d1",
+        "--size",
+        "small",
     ]);
     assert!(err.contains("forbidden: create denied"));
 
@@ -62,6 +64,8 @@ fn permissions_gate_each_action() {
         "t1",
         "--description",
         "d1",
+        "--size",
+        "small",
     ]);
     assert!(out.contains("created task 1"));
 
@@ -117,6 +121,8 @@ fn permissions_gate_each_action() {
         "1",
         "--status",
         "completed",
+        "--note",
+        "done",
     ]);
     assert!(err.contains("forbidden: set_status denied"));
 
@@ -144,6 +150,8 @@ fn permissions_gate_each_action() {
         "1",
         "--status",
         "completed",
+        "--note",
+        "done",
     ]);
     assert!(out.contains("status updated"));
 

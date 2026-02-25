@@ -40,12 +40,45 @@ Do not activate for tiny one-step work that can finish without checkpoints.
 - keep one project per board
 - represent each major phase as a task
 - represent each gate as its own checkpoint task
-- make each 30-minute microtask its own task for clear ownership and tracking
-- it's okay to have dozens of tasks if the work is large and complex, but avoid unnecessary microtask fragmentation
+- every task must declare size (`micro|small|medium|large`)
+- avoid unnecessary microtask fragmentation; use dependencies instead of long free-text sequencing
 - encode ordering with dependencies, never by informal text only
 - on scope change, pause execution and re-plan before resuming
 - in multi-role mode, only planning roles can mutate plan content
 - `--user` must be the blackboard actor identity (agent name or stable agent id), not an operating-system username
+
+## Task Sizing Policy
+
+- `micro`: <= 30 minutes
+- `small`: 30 minutes to 1 workday
+- `medium`: 1 to 3 workdays
+- `large`: > 3 workdays
+
+Use task creation threshold:
+
+- create a task when work is > 30 minutes, has handoff, has dependency/gate, or has elevated risk
+- do not create a task for tiny one-step work without checkpoint value
+
+## Large Task Policy
+
+- large tasks are planning containers, not direct execution checkpoints
+- large task dependencies are auto-managed from all direct children
+- manual `--depends-on` for large tasks is rejected
+- manual status to `in_progress`/`completed` on large tasks is rejected
+- large status is recomputed from child states and system notes are appended on auto-status changes
+
+## Post Note Policy
+
+- status transitions to `blocked` or `completed` must include `--note`
+- notes are append-only and shown in `task view` under `postNotes`
+- include concrete evidence in completion notes and blocker reason/next owner in blocked notes
+
+## Task Count Estimation
+
+- production hotfix (0.5-1 day): 6-10 tasks
+- single-service feature (2-3 days): 10-16 tasks
+- multi-service feature (1-2 weeks): 24-40 tasks
+- migration/refactor (3-6 weeks): 45-80 tasks
 
 ## Role Archetypes (Multi-Role Mode)
 
@@ -105,11 +138,11 @@ Recommended default chain:
 5. finalize/release
 
 ```bash
-blackboard task add --user <planner> --board <board> --title "Phase 1: Implement" --description "Deliver the implementation."
-blackboard task add --user <planner> --board <board> --title "Gate 1: Security Review" --description "Review and resolve security findings." --depends-on "1"
-blackboard task add --user <planner> --board <board> --title "Gate 2: Quality Review" --description "Run quality checks and resolve issues." --depends-on "2"
-blackboard task add --user <planner> --board <board> --title "Gate 3: Acceptance Validation" --description "Validate against acceptance criteria." --depends-on "3"
-blackboard task add --user <planner> --board <board> --title "Phase 2: Finalize/Release" --description "Finalize changes and close delivery." --depends-on "4"
+blackboard task add --user <planner> --board <board> --title "Phase 1: Implement" --description "Deliver the implementation." --size medium
+blackboard task add --user <planner> --board <board> --title "Gate 1: Security Review" --description "Review and resolve security findings." --size small --depends-on "1"
+blackboard task add --user <planner> --board <board> --title "Gate 2: Quality Review" --description "Run quality checks and resolve issues." --size small --depends-on "2"
+blackboard task add --user <planner> --board <board> --title "Gate 3: Acceptance Validation" --description "Validate against acceptance criteria." --size small --depends-on "3"
+blackboard task add --user <planner> --board <board> --title "Phase 2: Finalize/Release" --description "Finalize changes and close delivery." --size small --depends-on "4"
 ```
 
 Use dependencies to enforce order.
@@ -126,6 +159,7 @@ Executor/reviewer loop:
 
 - list and view assigned tasks
 - move status (`pending`, `in_progress`, `completed`, `blocked`)
+- include `--note` when setting `blocked` or `completed`
 - report blockers through status and notes in updates
 
 ### 4) Apply Feedback Loops
@@ -133,9 +167,9 @@ Executor/reviewer loop:
 Default loop for each gate:
 
 1. run check
-2. if failing, mark `blocked` or keep `in_progress` and fix
+2. if failing, mark `blocked --note "<reason and next action>"` or keep `in_progress` and fix
 3. re-run check
-4. only mark `completed` when pass criteria are met
+4. only mark `completed --note "<evidence>"` when pass criteria are met
 
 ### 5) Handle Scope Changes
 
@@ -151,8 +185,8 @@ Prefer `--json` for inter-agent communication:
 ```bash
 blackboard --json task list --user <actor> --board <board>
 blackboard --json task view --user <actor> --board <board> --task-id <id>
-blackboard --json task status --user <actor> --board <board> --task-id <id> --status completed
-blackboard --json task status --user <actor> --board <board> --task-id <id> --status blocked
+blackboard --json task status --user <actor> --board <board> --task-id <id> --status completed --note "done"
+blackboard --json task status --user <actor> --board <board> --task-id <id> --status blocked --note "blocked by dependency"
 ```
 
 Output contract:
@@ -163,8 +197,9 @@ Output contract:
 ## Failure Policy
 
 - permission denied: board-admin must resolve grants/revokes
-- dependency validation error: planner must correct task graph
+- dependency validation error: planner must correct task graph and ensure dependencies complete before execution statuses
 - missing checkpoint/gate: planner must add explicit checkpoint tasks
+- note required error: actor must provide `--note` for `blocked`/`completed`
 - unclear requirements: stop execution and request re-plan
 
 Never bypass role boundaries or checkpoint gates as fallback behavior.

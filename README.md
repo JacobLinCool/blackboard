@@ -37,8 +37,10 @@ This makes it a strong backend for:
 - `user`: actor identity passed with `--user`
 - `board`: project scope boundary
 - `task`: work item inside one board
+- `size`: execution scope (`micro|small|medium|large`)
 - `permission`: explicit operation capability on a board
 - `dependency`: task graph edge (`dependsOn`)
+- `post note`: append-only status note recorded on task transitions
 
 ## Permission Model
 
@@ -72,6 +74,20 @@ Recommended operational meaning:
 - `completed`: done and accepted
 - `blocked`: waiting on dependency, decision, or permission
 
+Status note rule:
+
+- `blocked` and `completed` require `--note`
+- notes are append-only and shown in `task view` under `postNotes`
+
+## Task Size Model
+
+Allowed sizes:
+
+- `micro`: <= 30 minutes
+- `small`: 30 minutes to 1 workday
+- `medium`: 1 to 3 workdays
+- `large`: > 3 workdays
+
 ## Dependency Rules
 
 Dependencies are enforced by the CLI:
@@ -79,6 +95,14 @@ Dependencies are enforced by the CLI:
 - no self-dependency
 - dependency target must be in the same board
 - cycles are rejected
+- task cannot move to `in_progress`/`completed` until all dependencies are `completed`
+
+Large-task rules:
+
+- large task dependencies are auto-managed from its children
+- manual `--depends-on` is rejected for large tasks
+- manual status to `in_progress`/`completed` is rejected for large tasks
+- large task status is recomputed from child statuses
 
 Set dependencies via `--depends-on "1,3,5"`.
 
@@ -119,14 +143,14 @@ blackboard board grant --user manager --board alpha --target pm --permissions re
 blackboard board grant --user manager --board alpha --target engineer --permissions read,set_status
 
 # 5) Plan tasks as PM
-blackboard task add --user pm --board alpha --title "Alpha: Analyze Scope" --description "Clarify requirements and constraints."
-blackboard task add --user pm --board alpha --title "Alpha: Build Plan" --description "Break down delivery tasks."
+blackboard task add --user pm --board alpha --title "Alpha: Analyze Scope" --description "Clarify requirements and constraints." --size small
+blackboard task add --user pm --board alpha --title "Alpha: Build Plan" --description "Break down delivery tasks." --size medium
 blackboard task edit --user pm --board alpha --task-id 2 --depends-on "1"
 
 # 6) Execute as engineer
 blackboard task list --user engineer --board alpha
 blackboard task status --user engineer --board alpha --task-id 1 --status in_progress
-blackboard task status --user engineer --board alpha --task-id 1 --status completed
+blackboard task status --user engineer --board alpha --task-id 1 --status completed --note "implementation complete"
 blackboard task status --user engineer --board alpha --task-id 2 --status in_progress
 ```
 
@@ -204,11 +228,11 @@ blackboard board delete --user <actor> --board <board_name_or_id>
 ### Task
 
 ```bash
-blackboard task list --user <actor> --board <board_name_or_id> [--status <pending|in_progress|completed|blocked>] [--parent <task_id>] [--assignee <user>]
+blackboard task list --user <actor> --board <board_name_or_id> [--status <pending|in_progress|completed|blocked>] [--size <micro|small|medium|large>] [--parent <task_id>] [--assignee <user>]
 blackboard task view --user <actor> --board <board_name_or_id> --task-id <task_id>
-blackboard task add --user <actor> --board <board_name_or_id> --title <text> --description <text> [--parent <task_id>] [--assignee <user>] [--depends-on "1,3,5"]
-blackboard task edit --user <actor> --board <board_name_or_id> --task-id <task_id> [--title <text>] [--description <text>] [--parent <task_id>] [--assignee <user>] [--depends-on "1,3,5"] [--clear-depends-on]
-blackboard task status --user <actor> --board <board_name_or_id> --task-id <task_id> --status <pending|in_progress|completed|blocked>
+blackboard task add --user <actor> --board <board_name_or_id> --title <text> --description <text> --size <micro|small|medium|large> [--parent <task_id>] [--assignee <user>] [--depends-on "1,3,5"]
+blackboard task edit --user <actor> --board <board_name_or_id> --task-id <task_id> [--title <text>] [--description <text>] [--size <micro|small|medium|large>] [--parent <task_id>] [--assignee <user>] [--depends-on "1,3,5"] [--clear-depends-on]
+blackboard task status --user <actor> --board <board_name_or_id> --task-id <task_id> --status <pending|in_progress|completed|blocked> [--note <text>]
 blackboard task delete --user <actor> --board <board_name_or_id> --task-id <task_id>
 ```
 
@@ -224,7 +248,9 @@ blackboard task delete --user <actor> --board <board_name_or_id> --task-id <task
 - `forbidden` error:
   missing board permission for the action. Check with `board members`.
 - dependency validation error:
-  verify target task exists in same board and graph is acyclic.
+  verify target task exists in same board, graph is acyclic, and dependencies are completed before execution statuses.
+- `--note is required` error:
+  add `--note` when setting status to `blocked` or `completed`.
 - board/task not found:
   confirm actor has `read` and the board identifier is correct.
 

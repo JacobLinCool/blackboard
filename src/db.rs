@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS tasks(
     board_id INTEGER NOT NULL,
     title TEXT NOT NULL,
     description TEXT NOT NULL DEFAULT '',
+    size TEXT NOT NULL CHECK(size IN ('micro','small','medium','large')),
     parent_id INTEGER,
     assignee_id INTEGER,
     status TEXT NOT NULL CHECK(status IN ('pending','in_progress','completed','blocked')),
@@ -79,7 +80,20 @@ CREATE TABLE IF NOT EXISTS task_dependencies(
     CHECK(task_id != depends_on_task_id),
     FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
     FOREIGN KEY(depends_on_task_id) REFERENCES tasks(id) ON DELETE CASCADE
-);",
+);
+
+CREATE TABLE IF NOT EXISTS task_notes(
+    id INTEGER PRIMARY KEY,
+    task_id INTEGER NOT NULL,
+    author_id INTEGER,
+    status TEXT NOT NULL CHECK(status IN ('pending','in_progress','completed','blocked')),
+    body TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+    FOREIGN KEY(author_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_task_notes_task_id_id ON task_notes(task_id, id);",
     )?;
 
     validate_schema(conn)
@@ -87,9 +101,16 @@ CREATE TABLE IF NOT EXISTS task_dependencies(
 
 fn validate_schema(conn: &Connection) -> Res<()> {
     ensure_table_exists(conn, "board_member_permissions")?;
+    ensure_table_exists(conn, "task_notes")?;
     ensure_board_permission_schema(conn)?;
 
     let task_columns = table_columns(conn, "tasks")?;
+    if !task_columns.iter().any(|col| col == "size") {
+        return Err(Box::new(AppErr(
+            "schema",
+            "unsupported legacy schema detected: tasks.size is missing; remove ~/.blackboard/blackboard.db".into(),
+        )));
+    }
     if task_columns.iter().any(|col| col == "kind") {
         return Err(Box::new(AppErr(
             "schema",

@@ -38,6 +38,7 @@ Typical actions:
 - `task add`
 - `task edit`
 - `task delete`
+- set `--size` and dependency shape
 - update `--depends-on`
 
 ## 3) `implementer`
@@ -54,7 +55,7 @@ Typical actions:
 
 - `task list`
 - `task view`
-- `task status`
+- `task status` (with `--note` for `blocked`/`completed`)
 
 ## 4) `security-reviewer`
 
@@ -71,6 +72,7 @@ Typical actions:
 
 - `task view` security checkpoints
 - set gate status to `in_progress`, `blocked`, or `completed`
+- include blocker/completion evidence in `--note`
 
 ## 5) `quality-reviewer`
 
@@ -86,6 +88,7 @@ Typical actions:
 
 - `task view` quality checkpoints
 - set gate status based on pass/fail outcome
+- include findings summary in `--note` for `blocked`/`completed`
 
 ## 6) `validator`
 
@@ -102,6 +105,7 @@ Typical actions:
 
 - validate acceptance criteria task
 - mark final validation checkpoint `completed` or `blocked`
+- include acceptance evidence in `--note`
 
 ## 7) `release-owner`
 
@@ -117,7 +121,7 @@ Recommended permissions:
 Typical actions:
 
 - inspect release checkpoint tasks
-- mark release gate status
+- mark release gate status with closing note
 
 ## 8) `observer`
 
@@ -141,3 +145,4 @@ Typical actions:
 - Keep mutation rights only on planner roles unless explicitly required.
 - Use separate gate tasks for security, quality, and validation ownership.
 - If one role covers multiple gates, keep checkpoints separate for traceability.
+- Require `--note` on `blocked`/`completed` to preserve auditability.
